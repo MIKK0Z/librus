@@ -1,0 +1,4 @@
+<?php
+    $login = "login";
+    $pass = "password";
+?>
