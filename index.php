@@ -56,7 +56,11 @@
 
     $xml = simplexml_import_dom($page_dom);
 
-    $body = $xml -> xpath("//body");
+    foreach ($xml -> xpath("//div[@id='header'") as $node) {
+        $node -> remove();
+    }
+
+    // $body = $xml -> xpath("//body");
 
     // $head_elements = $xml -> xpath("//head/*");
 
@@ -64,9 +68,15 @@
     // $scripts = $xml->xpath('//script');
     
     // $styles = $xml -> xpath('//link[@rel="stylesheet"]/@href');
+
+    // $main = $xml -> xpath('//div[@id="body"]');
+
+    // echo $page_string;
+    echo $page_dom -> saveHTML();
 ?>
 
-<!DOCTYPE html>
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -89,28 +99,21 @@
         // }
     ?>
 
-    <!-- <style>
+    <style>
         .modal-box {
             display: none; !important
         }
 
-        .screen-only {
+       .screen-only {
             display: unset; !important
         }
-    </style> -->
+    </style>
 </head>
 <body>
     <?php
-    echo $page_string;
-        // foreach ($tables as $table) {
-        //     foreach ($table as $aa) {
-        //         echo $aa;
-        //         echo '<br>';
-        //     }
-            // echo "<table>";
-            // echo $table;
-            // echo "</table>";
-        // } 
+        foreach ($main as $element) {
+            echo $element -> asXML();
+        }
     ?>
 </body>
-</html>
+</html> -->
