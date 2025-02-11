@@ -11,6 +11,8 @@ const points_table_rows = document.querySelectorAll("table.decorated.stretch")[2
     if (second_term.innerHTML === "Brak ocen") {
         second_term.innerHTML = points_table_rows[(2 * j)].querySelectorAll("td")[5].innerHTML;
     }
+
+    // TODO dodać te oceny do rozwijanej tabelki
 });
 
 
