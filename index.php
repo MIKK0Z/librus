@@ -49,71 +49,38 @@
     post("https://api.librus.pl/OAuth/Authorization/2FA?client_id=46", $mysterious_data);
 
     $page_string = get("https://synergia.librus.pl/przegladaj_oceny/uczen");
+
     $page_string = preg_replace('/(src|href)=\"(.*?)\"/m', '$1="https://synergia.librus.pl$2"', $page_string);
 
-    $page_dom = new DOMDocument();
-    $page_dom->loadHTML($page_string);
+    $doc = new DOMDocument();
+    $doc -> loadHTML($page_string);
+    $xpath = new DOMXPath($doc);
 
-    $xml = simplexml_import_dom($page_dom);
-
-    foreach ($xml -> xpath("//div[@id='header'") as $node) {
-        $node -> remove();
+    foreach ($xpath -> query("//div[@id='header']") as $node) {
+        $node -> parentNode -> removeChild($node);
     }
 
-    // $body = $xml -> xpath("//body");
+    foreach ($xpath -> query("//div[@class='right screen-only']") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
 
-    // $head_elements = $xml -> xpath("//head/*");
+    foreach ($xpath -> query("//div[@class='container-icon']") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
 
-    // $script_src = $xml->xpath('//script/@src');
-    // $scripts = $xml->xpath('//script');
-    
-    // $styles = $xml -> xpath('//link[@rel="stylesheet"]/@href');
+    foreach ($xpath -> query("//h2[@class='inside']") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
 
-    // $main = $xml -> xpath('//div[@id="body"]');
+    foreach ($xpath -> query("//span[@class='fold']") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
 
-    // echo $page_string;
-    echo $page_dom -> saveHTML();
+    foreach ($xpath -> query("//div[@id='footer']") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
+
+    echo $doc -> saveHTML();
 ?>
 
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Librus projekt</title>
-    <?php
-        // echo $page_string;
-        // foreach ($script_src as $src) {
-        //     echo "<script src='" . $src . "'></script>";
-        // }
-
-        // foreach ($scripts as $script) {
-        //     echo "<script>";
-        //     echo $script;
-        //     echo "</script>";
-        // }
-
-        // foreach ($styles as $style) {
-        //     echo "<link rel='stylesheet' href='" . $style . "'>";
-        // }
-    ?>
-
-    <style>
-        .modal-box {
-            display: none; !important
-        }
-
-       .screen-only {
-            display: unset; !important
-        }
-    </style>
-</head>
-<body>
-    <?php
-        foreach ($main as $element) {
-            echo $element -> asXML();
-        }
-    ?>
-</body>
-</html> -->
+<script src="./combine_tables.js" defer></script>
