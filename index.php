@@ -1,5 +1,5 @@
 <script src="./combine_tables.js" defer></script>
-<script src="./combine_legends.js" defer></script>
+<script src="./remove_points_legend.js" defer></script>
 <script src="./show_hide.js"></script>
 
 <?php
