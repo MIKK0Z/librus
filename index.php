@@ -1,3 +1,7 @@
+<script src="./combine_tables.js" defer></script>
+<script src="./combine_legends.js" defer></script>
+<script src="./show_hide.js"></script>
+
 <?php
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
@@ -80,7 +84,10 @@
         $node -> parentNode -> removeChild($node);
     }
 
+    foreach ($xpath -> query("//script[@src='https://synergia.librus.pl/js/showHideRows.js']") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
+
     echo $doc -> saveHTML();
 ?>
 
-<script src="./combine_tables.js" defer></script>
