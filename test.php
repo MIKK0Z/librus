@@ -4,6 +4,8 @@
     ini_set('display_errors', 1);
     libxml_use_internal_errors(true);
 
+    header("Content-Type: text/plain");
+
     include("passwd.php");
 
     $cookie_file_path = "";
@@ -48,5 +50,10 @@
 
     $page_string = get("https://synergia.librus.pl/przegladaj_oceny/uczen");
 
-    $page_string = preg_replace('/(src|href)=\"(.*?)\"/m', '$1="https://synergia.librus.pl$2"', $page_string);
-    echo $page_string;
+    $doc = new DOMDocument();
+    $doc -> loadHTML($page_string);
+    $xpath = new DOMXPath($doc);
+
+    foreach ($xpath -> query("//span[@class='luckyNumber']/b/text()") as $node) {
+        echo $node -> nodeValue;
+    }
