@@ -1,5 +1,3 @@
-<script src="./combine_tables.js" defer></script>
-<script src="./remove_points_legend.js" defer></script>
 <script src="./show_hide.js"></script>
 
 <?php
@@ -7,8 +5,6 @@
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
     libxml_use_internal_errors(true);
-
-    // header("Content-Type: text/plain");
 
     include("passwd.php");
 
@@ -87,7 +83,145 @@
     foreach ($xpath -> query("//script[@src='https://synergia.librus.pl/js/showHideRows.js']") as $node) {
         $node -> parentNode -> removeChild($node);
     }
+    
+    foreach ($xpath -> query("//div[@class='legend left stretch'][2]") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
+
+    $marks_rows = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]");
+    $marks_first_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 3]");
+    $marks_second_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 7]");
+    $marks_show_hide_btns = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 1]");
+
+    $points_rows = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]");
+    $points_first_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]/td[position() = 3]");
+    $points_second_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]/td[position() = 6]");
+    $points_show_hide_btns = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]/td[position() = 1]");
+
+    $avgs_first_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 4]");
+    $avgs_second_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 8]");
+    $avgs_year = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 10]");
+
+    foreach ($marks_rows as $i => $marks_row) {
+        if ($i % 2 == 0) {
+            if ($marks_first_term -> item($i / 2) -> textContent == "Brak ocen" && $marks_second_term -> item($i / 2) -> textContent == "Brak ocen") {
+                $marks_first_term -> item($i / 2) -> parentNode -> replaceChild($points_first_term -> item($i / 2), $marks_first_term -> item($i / 2));
+                $marks_second_term -> item($i / 2) -> parentNode -> replaceChild($points_second_term -> item($i / 2), $marks_second_term -> item($i / 2));
+
+                // TODO jak sie kliknie otwieranie wszystkich to nie otwiera zamienionych
+                $marks_rows -> item($i + 1) -> parentNode -> replaceChild($points_rows -> item($i + 1), $marks_rows -> item($i + 1));
+                $marks_show_hide_btns -> item($i) -> parentNode -> replaceChild($points_show_hide_btns -> item($i), $marks_show_hide_btns -> item($i));
+
+                $first_term_avg = $doc -> createElement("td");
+                $first_term_numerator = 0;
+                $first_term_denominator = 0;
+
+                $first_term_marks = $points_first_term -> item($i / 2) -> textContent;
+                if ($first_term_marks == "Brak ocen") {
+                    $first_term_avg -> textContent = "-";
+                } else {
+                    $marks = preg_split("/\s+/", trim($first_term_marks));
+                    foreach ($marks as $mark) {
+                        $mark = explode("/", $mark);
+
+                        $first_term_numerator += floatval($mark[0]);
+                        $first_term_denominator += floatval($mark[1]);
+                    }
+                    $first_term_avg -> textContent = strval(round($first_term_numerator / $first_term_denominator, 2) * 100) . "%";
+                }
+                $avgs_first_term -> item($i / 2) -> parentNode -> replaceChild($first_term_avg, $avgs_first_term -> item($i / 2));
+
+                $second_term_avg = $doc -> createElement("td");
+                $second_term_numerator = 0;
+                $second_term_denominator = 0;
+
+                $second_term_marks = $points_second_term -> item($i / 2) -> textContent;
+                if ($second_term_marks == "Brak ocen") {
+                    $second_term_avg -> textContent = "-";
+                } else {
+                    $marks = preg_split("/\s+/", trim($second_term_marks));
+                    foreach ($marks as $mark) {
+                        $mark = explode("/", $mark);
+
+                        $second_term_numerator += floatval($mark[0]);
+                        $second_term_denominator += floatval($mark[1]);
+                    }
+                    $second_term_avg -> textContent = strval(round($second_term_numerator / $second_term_denominator, 2) * 100) . "%";
+                }
+                $avgs_second_term -> item($i / 2) -> parentNode -> replaceChild($second_term_avg, $avgs_second_term -> item($i / 2));
+
+                $year_avg = $doc -> createElement("td");
+                $year_numerator = $first_term_numerator + $second_term_numerator;
+                $year_denominator = $first_term_denominator + $second_term_denominator;
+
+                if ($first_term_marks == "Brak ocen" && $second_term_marks == "Brak ocen") {
+                    $year_avg -> textContent = "-";
+                } else {
+                    $year_avg -> textContent = strval(round($year_numerator / $year_denominator, 2) * 100) . "%";
+                }
+                $avgs_year -> item($i / 2) -> parentNode -> replaceChild($year_avg, $avgs_year -> item($i / 2));
+            } else {
+                $first_term_avg = $doc -> createElement("td");
+                $first_term_count = 0;
+                $first_term_sum = 0;
+
+                $first_term_marks = $marks_first_term -> item($i / 2) -> textContent;
+                if ($first_term_marks == "Brak ocen") {
+                    $first_term_avg -> textContent = "-";
+                } else {
+                    $marks = preg_split("/\s+/", trim($first_term_marks));
+                    foreach ($marks as $mark) {
+                        if ($mark == "np") {
+                            continue;
+                        }
+                        $mark = str_replace("+", ".5", $mark);
+                        $first_term_count += 1;
+                        $first_term_sum += floatval($mark);
+                    }
+                    $first_term_avg -> textContent = strval(round($first_term_sum / $first_term_count, 2));
+                }
+                $avgs_first_term -> item($i / 2) -> parentNode -> replaceChild($first_term_avg, $avgs_first_term -> item($i / 2));
+
+                $second_term_avg = $doc -> createElement("td");
+                $second_term_count = 0;
+                $second_term_sum = 0;
+
+                $second_term_marks = $marks_second_term -> item($i / 2) -> textContent;
+                if ($second_term_marks == "Brak ocen") {
+                    $second_term_avg -> textContent = "-";
+                } else {
+                    $marks = preg_split("/\s+/", trim($second_term_marks));
+                    foreach ($marks as $mark) {
+                        if ($mark == "np") {
+                            continue;
+                        }
+                        $mark = str_replace("+", ".5", $mark);
+                        $second_term_count += 1;
+                        $second_term_sum += floatval($mark);
+                    }
+                    $second_term_avg -> textContent = strval(round($second_term_sum / $second_term_count, 2));
+                }
+                $avgs_second_term -> item($i / 2) -> parentNode -> replaceChild($second_term_avg, $avgs_second_term -> item($i / 2));
+
+                $year_avg = $doc -> createElement("td");
+                $year_count = $first_term_count + $second_term_count;
+                $year_sum = $first_term_sum + $second_term_sum;
+
+                if ($year_count == 0) {
+                    $year_avg -> textContent = "-";
+                } else {
+                    $year_avg -> textContent = strval(round($year_sum / $year_count, 2));
+                }
+                $avgs_year -> item($i / 2) -> parentNode -> replaceChild($year_avg, $avgs_year -> item($i / 2));
+            }
+        }
+    }
+
+    foreach ($xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]") as $node) {
+        $node -> parentNode -> removeChild($node);
+    }
 
     echo $doc -> saveHTML();
+
 ?>
 

@@ -9,6 +9,8 @@ require "/srv/http/librus/PHPMailer/src/Exception.php";
 
 include("/srv/http/librus/passwd.php");
 
+libxml_use_internal_errors(true);
+
 $cookie_file_path = "";
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_COOKIEFILE, $cookie_file_path);
