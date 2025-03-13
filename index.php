@@ -91,12 +91,10 @@
     $marks_rows = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]");
     $marks_first_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 3]");
     $marks_second_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 7]");
-    $marks_show_hide_btns = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 1]");
 
     $points_rows = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]");
     $points_first_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]/td[position() = 3]");
     $points_second_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]/td[position() = 6]");
-    $points_show_hide_btns = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 2]/tbody/tr[position() != last() and position() != last() - 1]/td[position() = 1]");
 
     $avgs_first_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 4]");
     $avgs_second_term = $xpath -> query("//div[@class='container-background']//table[@class='decorated stretch' and position() = 1]/tr[position() != last() and position() != last() - 1]/td[position() = 8]");
@@ -108,9 +106,10 @@
                 $marks_first_term -> item($i / 2) -> parentNode -> replaceChild($points_first_term -> item($i / 2), $marks_first_term -> item($i / 2));
                 $marks_second_term -> item($i / 2) -> parentNode -> replaceChild($points_second_term -> item($i / 2), $marks_second_term -> item($i / 2));
 
-                // TODO jak sie kliknie otwieranie wszystkich to nie otwiera zamienionych
                 $marks_rows -> item($i + 1) -> parentNode -> replaceChild($points_rows -> item($i + 1), $marks_rows -> item($i + 1));
-                $marks_show_hide_btns -> item($i) -> parentNode -> replaceChild($points_show_hide_btns -> item($i), $marks_show_hide_btns -> item($i));
+                $desc_id = $marks_rows -> item($i + 1) -> getAttribute("id");
+                $desc_id = str_replace("_OP", "", $desc_id);
+                $points_rows -> item($i + 1) -> setAttribute("id", $desc_id);
 
                 $first_term_avg = $doc -> createElement("td");
                 $first_term_numerator = 0;
